@@ -2,7 +2,7 @@ import csv
 import json
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QColor
 from PyQt6.QtWidgets import (
     QFileDialog,
     QHeaderView,
@@ -84,10 +84,10 @@ class MultiDLWindow(QMainWindow):
 
     def info_updated_signal(self, row, info):
         key, value = info
-        col = self.header.index('Status' if key == 'Progress' else key)
-        item = self.table.item(row, col)
 
         if key == 'Progress':
+            col = self.header.index('Status')
+            item = self.table.item(row, col)
             progress_bar = self.table.cellWidget(row, col)
             if not progress_bar:
                 item.setText('')
@@ -95,15 +95,23 @@ class MultiDLWindow(QMainWindow):
                 progress_bar.setRange(0, 100)
                 self.table.setCellWidget(row, col, progress_bar)
             progress_bar.setValue(value)
+            return
 
-        elif key == 'Status':
+        # Set item text to value for key != 'Progress'
+        col = self.header.index(key)
+        item = self.table.item(row, col)
+        item.setText(value)
+
+        if key == 'Status':
+            # Remove prorgress bar if exist
             progress_bar = self.table.cellWidget(row, col)
             if progress_bar:
                 self.table.removeCellWidget(row, col)
-            item.setText(value)
-
-        else:
-            item.setText(value)
+            # Set text colour
+            if value == 'FINISHED':
+                item.setForeground(QColor('green'))
+            elif value == 'ERROR':
+                item.setForeground(QColor('red'))
 
     def create_download(self):
         url, _ = QInputDialog.getText(self, 'Create Download', 'Enter URL:')
