@@ -8,8 +8,8 @@ class Status(Enum):
     IDLE = 0
     DOWNLOADING = 1
     PAUSED = 2
-    COMPLETED = 3
-    FAILED = -1
+    FINISHED = 3
+    ERROR = -1
 
 class Download(QObject):
     # Default values
@@ -40,9 +40,9 @@ class Download(QObject):
             self._download()
         except Exception as e:
             print('Unhandled exception:', e)
-            self._set_status(Status.FAILED)
+            self._set_status(Status.ERROR)
             return
-        self._set_status(Status.COMPLETED)
+        self._set_status(Status.FINISHED)
 
     def _download(self):
         # Create home and temp directory if not exist
@@ -71,7 +71,7 @@ class Download(QObject):
         return options
 
     def _progress_hook(self, d):
-        total_size = d.get('total_bytes')
+        total_size = d.get('total_bytes') or d.get('total_bytes_estimate')
         downloaded_size = d.get('downloaded_bytes')
         if total_size is None or downloaded_size is None:
             return
