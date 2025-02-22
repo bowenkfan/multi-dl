@@ -6,9 +6,11 @@ from PyQt6.QtGui import QAction, QColor
 from PyQt6.QtWidgets import (
     QFileDialog,
     QHeaderView,
-    QInputDialog,
-    QProgressBar,
+    QHBoxLayout,
+    QLineEdit,
     QMainWindow,
+    QProgressBar,
+    QPushButton,
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
@@ -32,11 +34,6 @@ class MultiDLWindow(QMainWindow):
         menu_bar = self.menuBar()
         file_menu = menu_bar.addMenu('File')
 
-        # Action: create single download
-        create_download_action = QAction('Download from URL', self)
-        create_download_action.triggered.connect(self.create_download)
-        file_menu.addAction(create_download_action)
-
         # Action: create batch from csv file
         create_batch_csv_action = QAction('Download from CSV File', self)
         create_batch_csv_action.triggered.connect(self.create_batch_downloads_csv)
@@ -52,6 +49,18 @@ class MultiDLWindow(QMainWindow):
         box_layout = QVBoxLayout()
         main_widget.setLayout(box_layout)
         self.setCentralWidget(main_widget)
+
+        # URL input and download button
+        url_layout = QHBoxLayout()
+        self.url_input = QLineEdit()
+        self.url_input.setPlaceholderText("Enter URL")
+        download_button = QPushButton("Download")
+        download_button.clicked.connect(self.on_download_clicked)
+        self.url_input.returnPressed.connect(download_button.click)
+
+        url_layout.addWidget(self.url_input)
+        url_layout.addWidget(download_button)
+        box_layout.addLayout(url_layout)
 
         # Table widget and table header settings
         self.header = ['Title', 'Status', 'Speed', 'ETA']
@@ -114,12 +123,11 @@ class MultiDLWindow(QMainWindow):
             self.table.item(row, self.header.index('Speed')).setText('')
             self.table.item(row, self.header.index('ETA')).setText('')
 
-    def create_download(self):
-        url, _ = QInputDialog.getText(self, 'Create Download', 'Enter URL:')
-        url = url.strip()
-        if not url:
-            return  # no URL
-        self.manager.add_download(url)
+    def on_download_clicked(self):
+        url = self.url_input.text().strip()
+        if url:
+            self.manager.add_download(url)
+            self.url_input.clear()
 
     def create_batch_downloads_csv(self):
         filename, _ = QFileDialog.getOpenFileName(self, 'Select CSV File', '', 'CSV Files (*.csv)')
