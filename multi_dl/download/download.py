@@ -39,7 +39,7 @@ class Download(QObject):
         try:
             self._download()
         except Exception as e:
-            print('Unhandled exception:', e)
+            print(f'Unhandled exception downloading {self.url}:', e)
             self._set_status(Status.ERROR)
             return
         self._set_status(Status.FINISHED)
@@ -67,6 +67,7 @@ class Download(QObject):
         options['progress_hooks'] = [self._progress_hook]
         options['quiet'] = True
         options['noprogress'] = True
+        options['no_warnings'] = True
         
         return options
 
