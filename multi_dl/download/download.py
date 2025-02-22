@@ -74,10 +74,20 @@ class Download(QObject):
     def _progress_hook(self, d):
         total_size = d.get('total_bytes') or d.get('total_bytes_estimate')
         downloaded_size = d.get('downloaded_bytes')
-        if total_size is None or downloaded_size is None:
-            return
-        progress = int(downloaded_size / total_size * 100)
-        self.info_updated_signal.emit(('Progress', progress))
+        if total_size and downloaded_size:
+            progress = int(downloaded_size / total_size * 100)
+            self.info_updated_signal.emit(('Progress', progress))
+
+        if speed := d.get('speed'):
+            speed_mb_s = speed / (1024 * 1024)
+            self.info_updated_signal.emit(('Speed', f'{speed_mb_s:.2f} MB/s'))
+
+        if eta := d.get('eta'):
+            eta = int(eta)
+            minutes = eta // 60
+            seconds = eta % 60
+            eta_str = f'{minutes:02}:{seconds:02}' if minutes < 60 else f'{minutes // 60} hrs+'
+            self.info_updated_signal.emit(('ETA', eta_str))
             
     def _set_status(self, status):
         self.status = status

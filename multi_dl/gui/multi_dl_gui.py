@@ -54,7 +54,7 @@ class MultiDLWindow(QMainWindow):
         self.setCentralWidget(main_widget)
 
         # Table widget and table header settings
-        self.header = ['Title', 'Status']
+        self.header = ['Title', 'Status', 'Speed', 'ETA']
         self.table = QTableWidget()
         self.table.setColumnCount(len(self.header))
         self.table.setHorizontalHeaderLabels(self.header)
@@ -65,8 +65,12 @@ class MultiDLWindow(QMainWindow):
 
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
+        header.setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
+        header.setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
         
         self.table.setColumnWidth(1, 110)
+        self.table.setColumnWidth(2, 80)
+        self.table.setColumnWidth(3, 80)
 
     def on_download_added(self, download):
         row = self.table.rowCount()
@@ -87,10 +91,10 @@ class MultiDLWindow(QMainWindow):
 
         if key == 'Progress':
             col = self.header.index('Status')
-            item = self.table.item(row, col)
+            status_item = self.table.item(row, col)
             progress_bar = self.table.cellWidget(row, col)
             if not progress_bar:
-                item.setText('')
+                status_item.setText('')
                 progress_bar = QProgressBar()
                 progress_bar.setRange(0, 100)
                 self.table.setCellWidget(row, col, progress_bar)
@@ -102,16 +106,13 @@ class MultiDLWindow(QMainWindow):
         item = self.table.item(row, col)
         item.setText(value)
 
-        if key == 'Status':
-            # Remove prorgress bar if exist
+        if key == 'Status' and value in ['FINISHED', 'ERROR']:
             progress_bar = self.table.cellWidget(row, col)
             if progress_bar:
                 self.table.removeCellWidget(row, col)
-            # Set text colour
-            if value == 'FINISHED':
-                item.setForeground(QColor('green'))
-            elif value == 'ERROR':
-                item.setForeground(QColor('red'))
+            item.setForeground(QColor('green' if value == 'FINISHED' else 'red'))
+            self.table.item(row, self.header.index('Speed')).setText('')
+            self.table.item(row, self.header.index('ETA')).setText('')
 
     def create_download(self):
         url, _ = QInputDialog.getText(self, 'Create Download', 'Enter URL:')
