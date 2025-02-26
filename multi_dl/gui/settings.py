@@ -2,11 +2,9 @@ from PyQt6.QtCore import QSettings, Qt
 from PyQt6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
-    QFileDialog,
     QHBoxLayout,
     QLabel,
     QLineEdit,
-    QPushButton,
     QSpinBox,
     QVBoxLayout
 )
