@@ -37,9 +37,9 @@ class MultiDLWindow(QMainWindow):
 
         settings_menu = menu_bar.addMenu('Settings')
 
-        preferences_action = QAction('Preferences...', self)
-        preferences_action.triggered.connect(self.open_settings)
-        settings_menu.addAction(preferences_action)
+        settings_action = QAction('Settings...', self)
+        settings_action.triggered.connect(self.open_settings)
+        settings_menu.addAction(settings_action)
         
         file_menu = menu_bar.addMenu('File')
 
