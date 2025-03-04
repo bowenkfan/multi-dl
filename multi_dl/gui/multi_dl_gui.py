@@ -51,6 +51,10 @@ class MultiDLWindow(QMainWindow):
         create_batch_json_action.triggered.connect(self.create_batch_downloads_json)
         file_menu.addAction(create_batch_json_action)
 
+        create_batch_jsonl_action = QAction('Download from JSONL File', self)
+        create_batch_jsonl_action.triggered.connect(self.create_batch_downloads_jsonl)
+        file_menu.addAction(create_batch_jsonl_action)
+
         # Main widget and layout
         main_widget = QWidget()
         main_layout = QVBoxLayout()
@@ -114,6 +118,19 @@ class MultiDLWindow(QMainWindow):
 
         with open(filename, 'r', encoding='utf-8') as f:
             info_list = json.load(f)
+        
+        for info in info_list:
+            url = info['url']
+            title = info['title']
+            self.manager.add_download(url, title)
+
+    def create_batch_downloads_jsonl(self):
+        filename, _ = QFileDialog.getOpenFileName(self, 'Select JSONL File', '', 'JSONL Files (*.jsonl)')
+        if not filename:
+            return # cancelled
+
+        with open(filename, 'r', encoding='utf-8') as f:
+            info_list = [json.loads(line) for line in f]
         
         for info in info_list:
             url = info['url']
