@@ -6,6 +6,7 @@ from PyQt6.QtCore import pyqtSignal, QObject, QSettings
 
 from .download import Download
 
+
 class DownloadThread(Thread):
     def __init__(self, queue):
         super().__init__()
@@ -28,9 +29,10 @@ class DownloadThread(Thread):
     def stop(self):
         self._stop_event.set()
 
+
 class DownloadManager(QObject):
-    DEFAULT_HOME_DIRECTORY = os.path.expanduser('~/Downloads/Multi-DL/')
-    DEFAULT_TEMP_DIRECTORY = os.path.expanduser('~/Downloads/Multi-DL/.temp')
+    DEFAULT_HOME_DIRECTORY = os.path.expanduser("~/Downloads/Multi-DL/")
+    DEFAULT_TEMP_DIRECTORY = os.path.expanduser("~/Downloads/Multi-DL/.temp")
     DEFAULT_THREAD_COUNT = 5
 
     download_added_signal = pyqtSignal(Download)
@@ -65,15 +67,17 @@ class DownloadManager(QObject):
 
     def get_settings(self):
         settings = QSettings()
-        settings.setValue('threads', self.thread_count)
-        settings.setValue('download_directory', self.home_directory)
-        settings.setValue('temp_directory', self.temp_directory)
+        settings.setValue("threads", self.thread_count)
+        settings.setValue("download_directory", self.home_directory)
+        settings.setValue("temp_directory", self.temp_directory)
         return settings
 
     def update_settings(self, settings):
-        thread_count = settings.value('threads', DownloadManager.DEFAULT_THREAD_COUNT, type=int)
-        home_directory = settings.value('download_directory', '', type=str)
-        temp_directory = settings.value('temp_directory', '', type=str)
+        thread_count = settings.value(
+            "threads", DownloadManager.DEFAULT_THREAD_COUNT, type=int
+        )
+        home_directory = settings.value("download_directory", "", type=str)
+        temp_directory = settings.value("temp_directory", "", type=str)
 
         self._set_thread_count(thread_count)
         if home_directory:

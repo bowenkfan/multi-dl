@@ -1,3 +1,7 @@
+# MacOS
 .DS_Store
-.venv
+
+# Python
 __pycache__
+.venv
+pyproject.toml
